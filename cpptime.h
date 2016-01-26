@@ -149,9 +149,9 @@ public:
 			ret = timerfd_settime(fd, 0, &(events.at(fd).tspec), nullptr);
 			assert(ret == 0);
 		} else {
-			// TODO consider either removing the element or re-use the existing element here.
 			fd = free_ids.top();
 			free_ids.pop();
+			events.erase(fd);
 			events.insert(std::make_pair(fd, std::move(e)));
 			ev.events = EPOLLIN;
 			ev.data.fd = fd;
