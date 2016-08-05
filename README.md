@@ -57,7 +57,7 @@ are on a POSIX machine.
 
 ~~~
 cd tests
-clang++-3.6  -std=c++11 -Wall -Wextra -o tests timer_test.cpp -l pthread
+clang++  -std=c++11 -Wall -Wextra -o tests timer_test.cpp -l pthread
 ./tests
 ~~~
 

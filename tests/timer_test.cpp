@@ -138,7 +138,6 @@ TEST_CASE("Test delete timer in callback")
 		std::this_thread::sleep_for(milliseconds(20));
 	}
 }
-
 TEST_CASE("Test order of multiple timeouts")
 {
 	int i = 0;
@@ -178,13 +177,4 @@ TEST_CASE("Test with multiple timers")
 		std::this_thread::sleep_for(milliseconds(20));
 		REQUIRE(i == 43);
 	}
-}
-
-TEST_CASE("Test with null mutex")
-{
-	CppTime::Timer_t<CppTime::Null_mutex> t;
-	int i = 0;
-	t.add(milliseconds(100), [&](CppTime::timer_id) { i = 43; });
-	std::this_thread::sleep_for(milliseconds(120));
-	REQUIRE(i == 43);
 }
