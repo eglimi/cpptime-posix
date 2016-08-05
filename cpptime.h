@@ -121,15 +121,15 @@ public:
 		int fd = -1;
 
 		struct timespec first {
-			.tv_sec = duration_cast<seconds>(when).count(),
-			.tv_nsec = duration_cast<nanoseconds>(when).count() % 1000000000
+			.tv_sec = static_cast<time_t>(duration_cast<seconds>(when).count()),
+			.tv_nsec = static_cast<long>(duration_cast<nanoseconds>(when).count() % 1000000000)
 		};
 		struct timespec dur {
 			.tv_sec = 0, .tv_nsec = 0
 		};
 		if(period != duration::zero()) {
-			dur.tv_sec = duration_cast<seconds>(period).count();
-			dur.tv_nsec = duration_cast<nanoseconds>(period).count() % 1000000000;
+			dur.tv_sec = static_cast<time_t>(duration_cast<seconds>(period).count());
+			dur.tv_nsec = static_cast<long>(duration_cast<nanoseconds>(period).count() % 1000000000);
 		}
 		struct itimerspec tspec {
 			.it_interval = dur, .it_value = first
