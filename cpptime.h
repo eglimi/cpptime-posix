@@ -57,12 +57,12 @@ struct Null_mutex {
 	}
 };
 
-template <class Mutex = std::mutex> class Timer_t
+class Timer
 {
 
 	// Thread and locking variables.
-	using ulock = std::unique_lock<Mutex>;
-	Mutex m;
+	using ulock = std::unique_lock<std::mutex>;
+	std::mutex m;
 	std::thread worker;
 
 	// epoll
@@ -79,7 +79,7 @@ template <class Mutex = std::mutex> class Timer_t
 	std::atomic_bool done{false};
 
 public:
-	Timer_t() : m{}, worker{}, epollfd{-1}, free_ids{}, events{}, epoll_events()
+	Timer() : m{}, worker{}, epollfd{-1}, free_ids{}, events{}, epoll_events()
 	{
 		// Initialize epoll
 		epollfd = epoll_create(10); // 10 is arbitrary - must be larger than 0
@@ -94,10 +94,10 @@ public:
 		assert(ret == 0);
 
 		// Start worker thread that monitors timers
-		worker = std::thread(std::bind(&Timer_t::run, this));
+		worker = std::thread(std::bind(&Timer::run, this));
 	}
 
-	~Timer_t()
+	~Timer()
 	{
 		done = true;
 		uint64_t buf = 1;
@@ -226,8 +226,6 @@ private:
 		}
 	}
 };
-
-using Timer = Timer_t<>;
 
 } // end namespace CppTime
 
