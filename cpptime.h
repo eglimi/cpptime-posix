@@ -199,7 +199,7 @@ private:
 	{
 		while(!done) {
 			int nfds = epoll_wait(epollfd, &epoll_events[0], detail::max_events, -1);
-			assert(nfds > 0);
+			if(nfds <= 0) continue;
 
 			for(int i = 0; i < nfds; ++i) {
 				if(epoll_events[i].events == EPOLLIN) {
