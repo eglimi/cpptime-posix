@@ -1,19 +1,19 @@
 #ifndef CPPTIME_H_
 #define CPPTIME_H_
 
+#include <array>
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <functional>
-#include <thread>
 #include <mutex>
-#include <atomic>
-#include <unordered_map>
-#include <array>
 #include <stack>
-#include <unistd.h>
-#include <sys/timerfd.h>
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
+#include <sys/timerfd.h>
+#include <thread>
+#include <unistd.h>
+#include <unordered_map>
 
 namespace CppTime
 {
@@ -27,16 +27,17 @@ namespace detail
 
 const int max_events = 10;
 
-struct Event {
+struct Event
+{
 	template <typename Func>
-	Event(const itimerspec &tspec, Func &&handler)
-	    : tspec(tspec), handler(std::forward<Func>(handler)), valid(true)
+	Event(const itimerspec& tspec, Func&& handler)
+	  : tspec(tspec), handler(std::forward<Func>(handler)), valid(true)
 	{
 	}
-	Event(Event &&) = default;
-	Event &operator=(Event &&) = default;
-	Event(const Event &) = delete;
-	Event &operator=(const Event &) = delete;
+	Event(Event&&) = default;
+	Event& operator=(Event&&) = default;
+	Event(const Event&) = delete;
+	Event& operator=(const Event&) = delete;
 	struct itimerspec tspec;
 	handler_t handler;
 	bool valid;
@@ -44,7 +45,8 @@ struct Event {
 
 } // end namespace detail
 
-struct Null_mutex {
+struct Null_mutex
+{
 	void lock()
 	{
 	}
@@ -103,7 +105,7 @@ public:
 		uint64_t buf = 1;
 		write(closefd, &buf, sizeof(uint64_t));
 		worker.join();
-		for(auto &e : events) {
+		for(auto& e : events) {
 			close(e.first);
 		}
 		close(epollfd);
@@ -113,25 +115,29 @@ public:
 		}
 	}
 
-	inline timer_id add(
-	    const duration &when, handler_t &&handler, const duration &period = duration::zero())
+	inline timer_id add(const duration& when, handler_t&& handler,
+	                    const duration& period = duration::zero())
 	{
 		using namespace std::chrono;
 
 		int fd = -1;
 
-		struct timespec first {
+		struct timespec first
+		{
 			.tv_sec = static_cast<time_t>(duration_cast<seconds>(when).count()),
 			.tv_nsec = static_cast<long>(duration_cast<nanoseconds>(when).count() % 1000000000)
 		};
-		struct timespec dur {
+		struct timespec dur
+		{
 			.tv_sec = 0, .tv_nsec = 0
 		};
 		if(period != duration::zero()) {
 			dur.tv_sec = static_cast<time_t>(duration_cast<seconds>(period).count());
-			dur.tv_nsec = static_cast<long>(duration_cast<nanoseconds>(period).count() % 1000000000);
+			dur.tv_nsec =
+			  static_cast<long>(duration_cast<nanoseconds>(period).count() % 1000000000);
 		}
-		struct itimerspec tspec {
+		struct itimerspec tspec
+		{
 			.it_interval = dur, .it_value = first
 		};
 
@@ -164,7 +170,7 @@ public:
 		return fd;
 	}
 
-	inline timer_id add(const uint64_t when, handler_t &&handler, const uint64_t period = 0)
+	inline timer_id add(const uint64_t when, handler_t&& handler, const uint64_t period = 0)
 	{
 		return add(duration(when), std::move(handler), duration(period));
 	}
@@ -178,10 +184,12 @@ public:
 		}
 
 		// Disarm the timer
-		struct timespec none {
+		struct timespec none
+		{
 			0, 0
 		};
-		struct itimerspec tspec {
+		struct itimerspec tspec
+		{
 			none, none
 		};
 		events.at(id).tspec = tspec;
