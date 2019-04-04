@@ -96,7 +96,7 @@ public:
 		assert(ret == 0);
 
 		// Start worker thread that monitors timers
-		worker = std::thread(std::bind(&Timer::run, this));
+		worker = std::thread([this]{ run(); });
 	}
 
 	~Timer()
